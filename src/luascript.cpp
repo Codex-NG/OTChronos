@@ -2022,9 +2022,6 @@ void LuaScriptInterface::registerFunctions()
 	registerClass("Creature", "", LuaScriptInterface::luaCreatureCreate);
 	registerMetaMethod("Creature", "__eq", LuaScriptInterface::luaUserdataCompare);
 
-	registerMethod("Creature", "registerEvent", LuaScriptInterface::luaCreatureRegisterEvent);
-	registerMethod("Creature", "unregisterEvent", LuaScriptInterface::luaCreatureUnregisterEvent);
-
 	registerMethod("Creature", "isRemoved", LuaScriptInterface::luaCreatureIsRemoved);
 	registerMethod("Creature", "isCreature", LuaScriptInterface::luaCreatureIsCreature);
 	registerMethod("Creature", "isPlayer", LuaScriptInterface::luaCreatureIsPlayer);
@@ -7155,32 +7152,6 @@ int32_t LuaScriptInterface::luaCreatureCreate(lua_State* L)
 	if (creature) {
 		pushUserdata<Creature>(L, creature);
 		setCreatureMetatable(L, -1, creature);
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int32_t LuaScriptInterface::luaCreatureRegisterEvent(lua_State* L)
-{
-	// creature:registerEvent(name)
-	Creature* creature = getUserdata<Creature>(L, 1);
-	if (creature) {
-		const std::string& name = getString(L, 2);
-		pushBoolean(L, creature->registerCreatureEvent(name));
-	} else {
-		lua_pushnil(L);
-	}
-	return 1;
-}
-
-int32_t LuaScriptInterface::luaCreatureUnregisterEvent(lua_State* L)
-{
-	// creature:unregisterEvent(name)
-	const std::string& name = getString(L, 2);
-	Creature* creature = getUserdata<Creature>(L, 1);
-	if (creature) {
-		pushBoolean(L, creature->unregisterCreatureEvent(name));
 	} else {
 		lua_pushnil(L);
 	}

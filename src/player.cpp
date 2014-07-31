@@ -23,7 +23,6 @@
 #include "chat.h"
 #include "combat.h"
 #include "configmanager.h"
-#include "creatureevent.h"
 #include "game.h"
 #include "house.h"
 #include "iologindata.h"
@@ -43,7 +42,6 @@ extern Chat g_chat;
 extern Vocations g_vocations;
 extern MoveEvents* g_moveEvents;
 extern Weapons* g_weapons;
-extern CreatureEvents* g_creatureEvents;
 extern Events* g_events;
 
 MuteCountMap Player::muteCountMap;
@@ -639,7 +637,7 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 		ss << "You advanced to " << getSkillName(skill) << " level " << skills[skill][SKILLVALUE_LEVEL] << '.';
 		sendTextMessage(MESSAGE_EVENT_ADVANCE, ss.str());
 
-		g_creatureEvents->playerAdvance(this, skill, (skills[skill][SKILLVALUE_LEVEL] - 1), skills[skill][SKILLVALUE_LEVEL]);
+		g_events->eventPlayerOnAdvance(this, skill, (skills[skill][SKILLVALUE_LEVEL] - 1), skills[skill][SKILLVALUE_LEVEL]);
 
 		sendUpdateSkills = true;
 		currReqTries = nextReqTries;
@@ -1092,7 +1090,7 @@ void Player::sendPing()
 	}
 
 	if (noPongTime >= 60000 && canLogout()) {
-		if (g_creatureEvents->playerLogout(this)) {
+		if (g_events->eventPlayerOnLogout(this)) {
 			if (client) {
 				client->logout(true, true);
 			} else {
@@ -1768,7 +1766,7 @@ void Player::addManaSpent(uint64_t amount)
 		ss << "You advanced to magic level " << magLevel << '.';
 		sendTextMessage(MESSAGE_EVENT_ADVANCE, ss.str());
 
-		g_creatureEvents->playerAdvance(this, SKILL_MAGLEVEL, magLevel - 1, magLevel);
+		g_events->eventPlayerOnAdvance(this, SKILL_MAGLEVEL, magLevel - 1, magLevel);
 
 		sendUpdateStats = true;
 		currReqMana = nextReqMana;
@@ -1884,7 +1882,7 @@ void Player::addExperience(Creature* target, uint64_t exp, bool sendText/* = fal
 			party->updateSharedExperience();
 		}
 
-		g_creatureEvents->playerAdvance(this, SKILL_LEVEL, prevLevel, level);
+		g_events->eventPlayerOnAdvance(this, SKILL_LEVEL, prevLevel, level);
 
 		std::ostringstream ss;
 		ss << "You advanced from Level " << prevLevel << " to Level " << level << '.';
@@ -2372,7 +2370,7 @@ void Player::addList()
 
 void Player::kickPlayer(bool displayEffect)
 {
-	g_creatureEvents->playerLogout(this);
+	g_events->eventPlayerOnLogout(this);
 	if (client) {
 		client->logout(displayEffect, true);
 	} else {
@@ -3691,9 +3689,10 @@ void Player::onIdleStatus()
 void Player::onPlacedCreature()
 {
 	//scripting event - onLogin
-	if (!g_creatureEvents->playerLogin(this)) {
+	/*std::cout << "we spawned " << this->getName() << "." << std::endl;
+	if (!g_events->eventplayer(this)) {
 		kickPlayer(true);
-	}
+	}*/
 }
 
 void Player::onRemovedCreature()
@@ -4534,7 +4533,7 @@ bool Player::addOfflineTrainingTries(skills_t skill, int32_t tries)
 			magLevel++;
 			manaSpent = 0;
 
-			g_creatureEvents->playerAdvance(this, SKILL_MAGLEVEL, magLevel - 1, magLevel);
+			g_events->eventPlayerOnAdvance(this, SKILL_MAGLEVEL, magLevel - 1, magLevel);
 
 			sendUpdate = true;
 			currReqMana = nextReqMana;
@@ -4591,7 +4590,7 @@ bool Player::addOfflineTrainingTries(skills_t skill, int32_t tries)
 			skills[skill][SKILLVALUE_TRIES] = 0;
 			skills[skill][SKILLVALUE_PERCENT] = 0;
 
-			g_creatureEvents->playerAdvance(this, skill, (skills[skill][SKILLVALUE_LEVEL] - 1), skills[skill][SKILLVALUE_LEVEL]);
+			g_events->eventPlayerOnAdvance(this, skill, (skills[skill][SKILLVALUE_LEVEL] - 1), skills[skill][SKILLVALUE_LEVEL]);
 
 			sendUpdate = true;
 			currReqTries = nextReqTries;

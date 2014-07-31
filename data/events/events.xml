@@ -17,13 +17,28 @@
 	<event class="Player" method="onTradeRequest" enabled="0"/>
 	<event class="Player" method="onGainExperience" enabled="0"/>
 	<event class="Player" method="onLoseExperience" enabled="0"/>
+	<event class="Player" method="onLogin" enabled="1"/>
+	<event class="Player" method="onLogout" enabled="0"/>
+	<event class="Player" method="onAdvance" enabled="0"/>
+	<event class="Player" method="onModalWindow" enabled="0"/>
+	<event class="Player" method="onTextEdit" enabled="0"/>
+	<event class="Player" method="onExtendedOpcode" enabled="0"/>
+	
 	
 	<!-- Creature methods -->
 	<event class="Creature" method="onTarget" enabled ="0"/>
 	<event class="Creature" method="onChangeOutfit" enabled="0"/>
 	<event class="Creature" method="onAttack" enabled="0"/>
 	<event class="Creature" method="onHear" enabled="0"/>
+	<event class="Creature" method="onThink" enabled="1"/>
+	<event class="Creature" method="onPrepareDeath" enabled="1"/>
+	<event class="Creature" method="onDeath" enabled="1"/>
+	<event class="Creature" method="onKill" enabled="1"/>
+	<event class="Creature" method="onChangeHealth" enabled="1"/>
+	<event class="Creature" method="onChangeMana" enabled="1"/>
 	
 	<!-- Monster methods -->
 	<event class="Monster" method="onTargetDeny" enabled ="0"/>
+	<event class="Monster" method="onAppear" enabled ="1"/>
+	<event class="Monster" method="onDisappear" enabled ="1"/>
 </events>

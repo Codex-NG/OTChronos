@@ -55,7 +55,6 @@ extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
 extern Weapons* g_weapons;
 extern Game g_game;
-extern CreatureEvents* g_creatureEvents;
 extern GlobalEvents* g_globalEvents;
 extern Events* g_events;
 extern Chat g_chat;
@@ -254,9 +253,6 @@ void Commands::reloadInfo(Player& player, const std::string& param)
 	} else if (tmpParam == "command" || tmpParam == "commands") {
 		reload();
 		player.sendTextMessage(MESSAGE_STATUS_CONSOLE_BLUE, "Reloaded commands.");
-	} else if (tmpParam == "creaturescript" || tmpParam == "creaturescripts") {
-		g_creatureEvents->reload();
-		player.sendTextMessage(MESSAGE_STATUS_CONSOLE_BLUE, "Reloaded creature scripts.");
 	} else if (tmpParam == "monster" || tmpParam == "monsters") {
 		g_monsters.reload();
 		player.sendTextMessage(MESSAGE_STATUS_CONSOLE_BLUE, "Reloaded monsters.");

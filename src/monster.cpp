@@ -30,7 +30,6 @@
 
 extern Game g_game;
 extern Monsters g_monsters;
-extern CreatureEvents* g_creatureEvents;
 extern Events* g_events;
 
 int32_t Monster::despawnRange;
@@ -90,13 +89,6 @@ Monster::Monster(MonsterType* _mtype) :
 	stepDuration = 0;
 
 	lastMeleeAttack = 0;
-
-	// register creature events
-	for (const std::string& scriptName : mType->scriptList) {
-		if (!registerCreatureEvent(scriptName)) {
-			std::cout << "[Warning - Monster::Monster] Unknown event name: " << scriptName << std::endl;
-		}
-	}
 }
 
 Monster::~Monster()
@@ -178,7 +170,7 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 
 	if (isLogout && creature == this)
-		g_creatureEvents->creatureDisappear(this);
+		g_events->eventMonsterOnDisappear(this);
 
 	if (mType->creatureDisappearEvent != -1) {
 		// onCreatureDisappear(self, creature)

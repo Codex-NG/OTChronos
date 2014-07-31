@@ -51,9 +51,9 @@ class Events
 		bool eventPlayerOnTradeRequest(Player* player, Player* target, Item* item);
 		bool eventPlayerOnGainExperience(Player* player, Creature* target, uint64_t &exp, uint64_t rawExp);
 		bool eventPlayerOnLoseExperience(Player* player, uint64_t &exp);
-		bool eventPlayerOnLogin(Player* player);
+		bool eventPlayerOnLogin(Creature* creature);
 		bool eventPlayerOnLogout(Player* player);
-		bool eventPlayerOnAdvance(Player* player, skills_t, uint32_t, uint32_t);
+		bool eventPlayerOnAdvance(Player* player, skills_t skill, uint32_t oldLevel, uint32_t newLevel);
 		void eventPlayerOnModalWindow(Player* player, uint32_t modalWindowId, uint8_t buttonId, uint8_t choiceId);
 		bool eventPlayerOnTextEdit(Player* player, Item* item, const std::string& text);
 		void eventPlayerOnExtendedOpcode(Player* player, uint8_t opcode, const std::string& buffer);

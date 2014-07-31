@@ -59,7 +59,6 @@ extern Spells* g_spells;
 extern Vocations g_vocations;
 extern GlobalEvents* g_globalEvents;
 extern Events* g_events;
-extern CreatureEvents* g_creatureEvents;
 
 Game::Game() :
 	wildcardTree(false),
@@ -572,7 +571,10 @@ bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool e
 	creature->setID();
 	creature->addList();
 	if (!creature->getPlayer()) {
-		g_creatureEvents->creatureAppear(creature);
+		g_events->eventMonsterOnAppear(creature);
+	}
+	if (creature->getPlayer()) {
+		g_events->eventPlayerOnLogin(creature);
 	}
 	return true;
 }
@@ -2468,11 +2470,9 @@ void Game::playerWriteItem(uint32_t playerId, uint32_t windowTextId, const std::
 		return;
 	}
 
-	for (auto creatureEvent : player->getCreatureEvents(CREATURE_EVENT_TEXTEDIT)) {
-		if (!creatureEvent->executeTextEdit(player, writeItem, text)) {
-			player->setWriteItem(nullptr);
-			return;
-		}
+	if (!g_events->eventPlayerOnTextEdit(player, writeItem, text)) {
+		player->setWriteItem(nullptr);
+		return;
 	}
 
 	if (!text.empty()) {
@@ -3997,14 +3997,9 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 		}
 
 		if (damage.origin != ORIGIN_NONE) {
-			const auto& events = target->getCreatureEvents(CREATURE_EVENT_CHANGEHEALTH);
-			if (!events.empty()) {
-				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeChangeHealth(target, attacker, damage);
-				}
-				damage.origin = ORIGIN_NONE;
-				return combatChangeHealth(attacker, target, damage);
-			}
+			g_events->eventCreatureOnChangeHealth(target, attacker, damage);
+			damage.origin = ORIGIN_NONE;
+			return combatChangeHealth(attacker, target, damage);
 		}
 
 		int32_t realHealthChange = target->getHealth();
@@ -4097,16 +4092,11 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 			int32_t manaDamage = std::min<int32_t>(target->getMana(), healthChange);
 			if (manaDamage != 0) {
 				if (damage.origin != ORIGIN_NONE) {
-					const auto& events = target->getCreatureEvents(CREATURE_EVENT_CHANGEMANA);
-					if (!events.empty()) {
-						for (CreatureEvent* creatureEvent : events) {
-							creatureEvent->executeChangeMana(target, attacker, healthChange, damage.origin);
-						}
-						if (healthChange == 0) {
-							return true;
-						}
-						manaDamage = std::min<int32_t>(target->getMana(), healthChange);
+					g_events->eventCreatureOnChangeMana(target, attacker, healthChange, damage.origin);
+					if (healthChange == 0) {
+						return true;
 					}
+					manaDamage = std::min<int32_t>(target->getMana(), healthChange);
 				}
 
 				target->drainMana(attacker, manaDamage);
@@ -4164,14 +4154,9 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 		}
 
 		if (damage.origin != ORIGIN_NONE) {
-			const auto& events = target->getCreatureEvents(CREATURE_EVENT_CHANGEHEALTH);
-			if (!events.empty()) {
-				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeChangeHealth(target, attacker, damage);
-				}
-				damage.origin = ORIGIN_NONE;
-				return combatChangeHealth(attacker, target, damage);
-			}
+			g_events->eventCreatureOnChangeHealth(target, attacker, damage);
+			damage.origin = ORIGIN_NONE;
+			return combatChangeHealth(attacker, target, damage);
 		}
 
 		int32_t targetHealth = target->getHealth();
@@ -4186,10 +4171,8 @@ bool Game::combatChangeHealth(Creature* attacker, Creature* target, CombatDamage
 		if (realDamage == 0) {
 			return true;
 		} else if (realDamage >= targetHealth) {
-			for (CreatureEvent* creatureEvent : target->getCreatureEvents(CREATURE_EVENT_PREPAREDEATH)) {
-				if (!creatureEvent->executeOnPrepareDeath(target, attacker)) {
-					return false;
-				}
+			if (!g_events->eventCreatureOnPrepareDeath(target, attacker)) {
+				return false;
 			}
 		}
 
@@ -4276,13 +4259,8 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 		}
 
 		if (origin != ORIGIN_NONE) {
-			const auto& events = target->getCreatureEvents(CREATURE_EVENT_CHANGEMANA);
-			if (!events.empty()) {
-				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeChangeMana(target, attacker, manaChange, origin);
-				}
-				return combatChangeMana(attacker, target, manaChange, ORIGIN_NONE);
-			}
+			g_events->eventCreatureOnChangeMana(target, attacker, manaChange, origin);
+			return combatChangeMana(attacker, target, manaChange, ORIGIN_NONE);
 		}
 
 		target->changeMana(manaChange);
@@ -4323,13 +4301,8 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 		}
 
 		if (origin != ORIGIN_NONE) {
-			const auto& events = target->getCreatureEvents(CREATURE_EVENT_CHANGEMANA);
-			if (!events.empty()) {
-				for (CreatureEvent* creatureEvent : events) {
-					creatureEvent->executeChangeMana(target, attacker, manaChange, origin);
-				}
-				return combatChangeMana(attacker, target, manaChange, ORIGIN_NONE);
-			}
+			g_events->eventCreatureOnChangeMana(target, attacker, manaChange, origin);
+			return combatChangeMana(attacker, target, manaChange, ORIGIN_NONE);
 		}
 
 		target->drainMana(attacker, manaLoss);
@@ -5691,9 +5664,7 @@ void Game::parsePlayerExtendedOpcode(uint32_t playerId, uint8_t opcode, const st
 		return;
 	}
 
-	for (CreatureEvent* creatureEvent : player->getCreatureEvents(CREATURE_EVENT_EXTENDED_OPCODE)) {
-		creatureEvent->executeExtendedOpcode(player, opcode, buffer);
-	}
+	g_events->eventPlayerOnExtendedOpcode(player, opcode, buffer);
 }
 
 void Game::forceAddCondition(uint32_t creatureId, Condition* condition)
@@ -5757,9 +5728,7 @@ void Game::playerAnswerModalWindow(uint32_t playerId, uint32_t modalWindowId, ui
 
 		player->setBedItem(nullptr);
 	} else {
-		for (auto creatureEvent : player->getCreatureEvents(CREATURE_EVENT_MODALWINDOW)) {
-			creatureEvent->executeModalWindow(player, modalWindowId, button, choice);
-		}
+		g_events->eventPlayerOnModalWindow(player, modalWindowId, button, choice);
 	}
 }
 

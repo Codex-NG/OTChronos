@@ -27,10 +27,11 @@
 #include "spawn.h"
 #include "pugicast.h"
 #include "luascript.h"
+#include "events.h"
 
 extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
-extern CreatureEvents* g_creatureEvents;
+extern Events* g_events;
 
 enum {
 	EVENT_ID_LOADING = 1,
@@ -276,7 +277,7 @@ void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool 
 	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 
 	if (isLogout && creature == this)
-		g_creatureEvents->creatureDisappear(this);
+		g_events->eventMonsterOnDisappear(this);
 
 	if (creature == this) {
 		closeAllShopWindows();

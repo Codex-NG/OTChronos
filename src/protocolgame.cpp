@@ -44,14 +44,14 @@
 #include "mounts.h"
 #include "ban.h"
 #include "connection.h"
-#include "creatureevent.h"
 #include "scheduler.h"
+#include "events.h"
 
 extern Game g_game;
 extern ConfigManager g_config;
 extern Actions actions;
-extern CreatureEvents* g_creatureEvents;
 Chat g_chat;
+extern Events* g_events;
 
 // Helping templates to add dispatcher tasks
 template<class FunctionType>
@@ -195,9 +195,9 @@ void ProtocolGame::login(const std::string& name, uint32_t accountId, OperatingS
 			}
 		}
 
-		if (operatingSystem >= CLIENTOS_OTCLIENT_LINUX) {
+		/*if (operatingSystem >= CLIENTOS_OTCLIENT_LINUX) {
 			player->registerCreatureEvent("ExtendedOpcode");
-		}
+		}*/
 
 		player->lastIP = player->getIP();
 		player->lastLoginSaved = std::max<time_t>(time(nullptr), player->lastLoginSaved + 1);
@@ -271,7 +271,7 @@ void ProtocolGame::logout(bool displayEffect, bool forced)
 			}
 
 			//scripting event - onLogout
-			if (!g_creatureEvents->playerLogout(player)) {
+			if (!g_events->eventPlayerOnLogout(player)) {
 				//Let the script handle the error message
 				return;
 			}

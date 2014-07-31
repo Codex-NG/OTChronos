@@ -26,10 +26,8 @@
 #include "const.h"
 #include "tile.h"
 #include "enums.h"
-#include "creatureevent.h"
 
 typedef std::list<Condition*> ConditionList;
-typedef std::list<CreatureEvent*> CreatureEventList;
 
 enum slots_t {
 	CONST_SLOT_WHEREEVER = 0,
@@ -420,10 +418,6 @@ class Creature : virtual public Thing
 			skillLoss = _skillLoss;
 		}
 
-		//creature script events
-		bool registerCreatureEvent(const std::string& name);
-		bool unregisterCreatureEvent(const std::string& name);
-
 		Cylinder* getParent() const {
 			return _tile;
 		}
@@ -485,7 +479,6 @@ class Creature : virtual public Thing
 
 		std::list<Direction> listWalkDir;
 		std::list<Creature*> summons;
-		CreatureEventList eventsList;
 		ConditionList conditions;
 
 		Tile* _tile;
@@ -534,12 +527,6 @@ class Creature : virtual public Thing
 		bool hasFollowPath;
 		bool forceUpdateFollowPath;
 		bool hiddenHealth;
-
-		//creature script events
-		bool hasEventRegistered(CreatureEventType_t event) const {
-			return (0 != (scriptEventsBitField & ((uint32_t)1 << event)));
-		}
-		CreatureEventList getCreatureEvents(CreatureEventType_t type);
 
 		void updateMapCache();
 		void updateTileCache(const Tile* tile, int32_t dx, int32_t dy);

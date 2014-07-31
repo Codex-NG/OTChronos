@@ -37,7 +37,6 @@ double Creature::speedC = -4795.01;
 
 extern Game g_game;
 extern ConfigManager g_config;
-extern CreatureEvents* g_creatureEvents;
 extern Events* g_events;
 
 Creature::Creature() :
@@ -202,10 +201,7 @@ void Creature::onThink(uint32_t interval)
 	}
 
 	//scripting event - onThink
-	const CreatureEventList& thinkEvents = getCreatureEvents(CREATURE_EVENT_THINK);
-	for (CreatureEvent* thinkEvent : thinkEvents) {
-		thinkEvent->executeOnThink(this, interval);
-	}
+	g_events->eventCreatureOnThink(this, interval);
 }
 
 void Creature::onAttacking(uint32_t interval)
@@ -726,10 +722,7 @@ bool Creature::dropCorpse(Creature* _lastHitCreature, Creature* mostDamageCreatu
 	if (!lootDrop && getMonster()) {
 		if (master) {
 			//scripting event - onDeath
-			const CreatureEventList& deathEvents = getCreatureEvents(CREATURE_EVENT_DEATH);
-			for (CreatureEvent* deathEvent : deathEvents) {
-				deathEvent->executeOnDeath(this, nullptr, _lastHitCreature, mostDamageCreature, lastHitUnjustified, mostDamageUnjustified);
-			}
+			g_events->eventCreatureOnDeath(this, nullptr, _lastHitCreature, mostDamageCreature, lastHitUnjustified, mostDamageUnjustified);
 		}
 
 		g_game.addMagicEffect(getPosition(), CONST_ME_POFF);
@@ -763,9 +756,7 @@ bool Creature::dropCorpse(Creature* _lastHitCreature, Creature* mostDamageCreatu
 		}
 
 		//scripting event - onDeath
-		for (CreatureEvent* deathEvent : getCreatureEvents(CREATURE_EVENT_DEATH)) {
-			deathEvent->executeOnDeath(this, corpse, _lastHitCreature, mostDamageCreature, lastHitUnjustified, mostDamageUnjustified);
-		}
+		g_events->eventCreatureOnDeath(this, corpse, _lastHitCreature, mostDamageCreature, lastHitUnjustified, mostDamageUnjustified);
 
 		if (corpse) {
 			dropLoot(corpse->getContainer(), _lastHitCreature);
@@ -1157,10 +1148,7 @@ bool Creature::onKilledCreature(Creature* target, bool)
 	}
 
 	//scripting event - onKill
-	const CreatureEventList& killEvents = getCreatureEvents(CREATURE_EVENT_KILL);
-	for (CreatureEvent* killEvent : killEvents) {
-		killEvent->executeOnKill(this, target);
-	}
+	g_events->eventCreatureOnKill(this, target);
 	return false;
 }
 
@@ -1487,74 +1475,6 @@ void Creature::setNormalCreatureLight()
 {
 	internalLight.level = 0;
 	internalLight.color = 0;
-}
-
-bool Creature::registerCreatureEvent(const std::string& name)
-{
-	CreatureEvent* event = g_creatureEvents->getEventByName(name);
-	if (!event) {
-		return false;
-	}
-
-	CreatureEventType_t type = event->getEventType();
-	if (hasEventRegistered(type)) {
-		for (CreatureEvent* creatureEvent : eventsList) {
-			if (creatureEvent == event) {
-				return false;
-			}
-		}
-	} else {
-		scriptEventsBitField |= static_cast<uint32_t>(1) << type;
-	}
-
-	eventsList.push_back(event);
-	return true;
-}
-
-bool Creature::unregisterCreatureEvent(const std::string& name)
-{
-	CreatureEvent* event = g_creatureEvents->getEventByName(name);
-	if (!event) {
-		return false;
-	}
-
-	CreatureEventType_t type = event->getEventType();
-	if (!hasEventRegistered(type)) {
-		return false;
-	}
-
-	bool resetTypeBit = true;
-	for (auto it = eventsList.begin(); it != eventsList.end(); ++it) {
-		CreatureEvent* curEvent = *it;
-		if (curEvent == event) {
-			it = eventsList.erase(it);
-		} else if (curEvent->getEventType() == type) {
-			resetTypeBit = false;
-		}
-	}
-
-	if (resetTypeBit) {
-		scriptEventsBitField &= ~(static_cast<uint32_t>(1) << type);
-	}
-
-	return true;
-}
-
-CreatureEventList Creature::getCreatureEvents(CreatureEventType_t type)
-{
-	CreatureEventList tmpEventList;
-
-	if (!hasEventRegistered(type)) {
-		return tmpEventList;
-	}
-
-	for (CreatureEvent* creatureEvent : eventsList) {
-		if (creatureEvent->getEventType() == type) {
-			tmpEventList.push_back(creatureEvent);
-		}
-	}
-
-	return tmpEventList;
 }
 
 bool FrozenPathingConditionCall::isInRange(const Position& startPos, const Position& testPos,
