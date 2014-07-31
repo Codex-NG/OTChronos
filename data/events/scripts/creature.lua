@@ -111,7 +111,6 @@ function Creature:onThink(interval)
 end
 
 function Creature:onPrepareDeath(killer)
-	print("Creature:onPrepareDeath works")
 	if not register(self, Register.prepareDeath) then
 		return true
 	end
@@ -126,10 +125,8 @@ local deathListEnabled = true
 local maxDeathRecords = 5
 function Creature:onDeath(corpse, killer, mostDamage, unjustified, mostDamage_unjustified)
 	if not self:isPlayer() then
-		print("Creature:onDeath (monster) works")
 		return true
 	end
-	print("Creature:onDeath (player) works")
 	self:sendTextMessage(MESSAGE_EVENT_ADVANCE, "You are dead.")
 	if not deathListEnabled then
 		return
@@ -209,17 +206,14 @@ function Creature:onDeath(corpse, killer, mostDamage, unjustified, mostDamage_un
 end
 
 function Creature:onKill(target)
-	print("Creature:onKill works")
 	return true
 end
 
 function Creature:onChangeHealth(attacker, primaryDamage, primaryType, secondaryDamage, secondaryType, origin)
-	print("Creature:onChangeHealth works")
 	return primaryDamage, primaryType, secondaryDamage, secondaryType
 end
 
 function Creature:onChangeMana(attacker, manaChange, origin)
-	print("Creature:onChangeMana works")
 	return -manaChange
 end
 

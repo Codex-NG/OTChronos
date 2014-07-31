@@ -3689,10 +3689,9 @@ void Player::onIdleStatus()
 void Player::onPlacedCreature()
 {
 	//scripting event - onLogin
-	/*std::cout << "we spawned " << this->getName() << "." << std::endl;
-	if (!g_events->eventplayer(this)) {
+	if (!g_events->eventPlayerOnLogin(this)) {
 		kickPlayer(true);
-	}*/
+	}
 }
 
 void Player::onRemovedCreature()

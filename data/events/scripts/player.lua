@@ -109,3 +109,55 @@ end
 function Player:onLoseExperience(exp)
 	return exp
 end
+
+local firstItems = {2050, 2382}
+function Player:onLogin()
+	local loginStr = "Welcome to " .. configManager.getString(configKeys.SERVER_NAME) .. "!"
+	if self:getLastLoginSaved() <= 0 then
+		loginStr = loginStr .. " Please choose your outfit."
+		self:sendOutfitWindow()
+	else
+		if loginStr ~= "" then
+			self:sendTextMessage(MESSAGE_STATUS_DEFAULT, loginStr)
+		end
+
+		loginStr = string.format("Your last visit was on %s.", os.date("%a %b %d %X %Y", self:getLastLoginSaved()))
+	end
+	self:sendTextMessage(MESSAGE_STATUS_DEFAULT, loginStr)
+	if self:getLastLoginSaved() == 0 then
+		for i = 1, #firstItems do
+			self:addItem(firstItems[i], 1)
+		end
+		self:addItem(self:getSex() == 0 and 2651 or 2650, 1)
+		self:addItem(1987, 1):addItem(2674, 1)
+	end
+	return true
+end
+
+function Player:onLogout()
+	return true
+end
+
+function Player:onAdvance(skill, oldLevel, newLevel)
+	return true
+end
+
+function Player:onModalWindow(modalWindowId, buttonId, choiceId)
+end
+
+function Player:onTextEdit(item, text)
+	return true
+end
+
+local OPCODE_LANGUAGE = 1
+function Player:onExtendedOpcode(opcode, buffer)
+	if opcode == OPCODE_LANGUAGE then
+		-- otclient language
+		if buffer == 'en' or buffer == 'pt' then
+			-- example, setting player language, because otclient is multi-language...
+			-- player:setStorageValue(SOME_STORAGE_ID, SOME_VALUE)
+		end
+	else
+		-- other opcodes can be ignored, and the server will just work fine...
+	end
+end

@@ -120,9 +120,6 @@ bool Events::load()
 				if (methodName == "onBrowseField") {
 					playerOnBrowseField = event;
 				}
-				else if (methodName == "onLogin") {
-					playerOnLogin = event;
-				}
 				else if (methodName == "onLook") {
 					playerOnLook = event;
 				} 
@@ -151,10 +148,10 @@ bool Events::load()
 					playerOnGainExperience = event;
 				} 
 				else if (methodName == "onLoseExperience") {
-					std::cout << "we set lose experience the event" << std::endl;
-					std::cout << event << std::endl;
 					playerOnLoseExperience = event;
-					std::cout << playerOnLoseExperience << std::endl;
+				}
+				else if (methodName == "onLogin") {
+					playerOnLogin = event;
 				}
 				else if (methodName == "onLogout") {
 					playerOnLogout = event;
@@ -215,9 +212,7 @@ bool Events::load()
 					monsterOnTargetDeny = event;
 				}
 				else if (methodName == "onAppear") {
-					std::cout << event << std::endl;
 					monsterOnAppear = event;
-					std::cout << monsterOnAppear << std::endl;
 				}
 				else if (methodName == "onDisappear") {
 					monsterOnDisappear = event;
@@ -661,20 +656,17 @@ bool Events::eventPlayerOnLoseExperience(Player* player, uint64_t &exp)
 	return exp != 0;
 }
 
-bool Events::eventPlayerOnLogin(Creature* creature)
+bool Events::eventPlayerOnLogin(Player* player)
 {
-	std::cout << "we went into onLogin" << std::endl;
 	//Player:onLogin(cid) or Player.onLogin(self, cid)
 	if (playerOnLogin == -1) {
 		return true;
 	}
-	std::cout << "we skipped the enabled check" << std::endl;
 
 	if (!scriptInterface.reserveScriptEnv()) {
 		std::cout << "[Error - Events::eventPlayerOnLogin] Call stack overflow" << std::endl;
 		return false;
 	}
-	std::cout << "no call stack overflow" << std::endl;
 
 	ScriptEnvironment* env = scriptInterface.getScriptEnv();
 	env->setScriptId(playerOnLogin, &scriptInterface);
@@ -682,13 +674,13 @@ bool Events::eventPlayerOnLogin(Creature* creature)
 	lua_State* L = scriptInterface.getLuaState();
 	scriptInterface.pushFunction(playerOnLogin);
 
-	LuaScriptInterface::pushUserdata<Creature>(L, creature);
-	LuaScriptInterface::setCreatureMetatable(L, -1, creature);
+	LuaScriptInterface::pushUserdata<Player>(L, player);
+	LuaScriptInterface::setMetatable(L, -1, "Player");
 
 	return scriptInterface.callFunction(1);
 }
 
-bool Events::eventPlayerOnLogout(Player* const player)
+bool Events::eventPlayerOnLogout(Player* player)
 {
 	//Player:onLogout() or Player.onLogout(self)
 	if (playerOnLogout == -1) {

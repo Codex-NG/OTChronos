@@ -573,9 +573,6 @@ bool Game::internalPlaceCreature(Creature* creature, const Position& pos, bool e
 	if (!creature->getPlayer()) {
 		g_events->eventMonsterOnAppear(creature);
 	}
-	if (creature->getPlayer()) {
-		g_events->eventPlayerOnLogin(creature);
-	}
 	return true;
 }
 

@@ -2,9 +2,6 @@ function Monster:onTargetDeny(target)
 end
 
 function Monster:onAppear()
-	if self:isPlayer() then
-		print("works")
-	end
 	if self:isMonster() then
 		if not isInArray(monsters, self:getName(),true) then
 			monsters[self:getName()] = {}
@@ -17,7 +14,6 @@ function Monster:onAppear()
 end
 
 function Monster:onDisappear()
-	print("Monster:onDisappear works")
 	if self:isMonster() then
 		for i = 1, #monsters[self:getName()] do
 			if monsters[self:getName()][i] == cid then

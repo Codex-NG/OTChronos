@@ -18,10 +18,10 @@
 	<event class="Player" method="onGainExperience" enabled="0"/>
 	<event class="Player" method="onLoseExperience" enabled="0"/>
 	<event class="Player" method="onLogin" enabled="1"/>
-	<event class="Player" method="onLogout" enabled="0"/>
-	<event class="Player" method="onAdvance" enabled="0"/>
-	<event class="Player" method="onModalWindow" enabled="0"/>
-	<event class="Player" method="onTextEdit" enabled="0"/>
+	<event class="Player" method="onLogout" enabled="1"/>
+	<event class="Player" method="onAdvance" enabled="1"/>
+	<event class="Player" method="onModalWindow" enabled="1"/>
+	<event class="Player" method="onTextEdit" enabled="1"/>
 	<event class="Player" method="onExtendedOpcode" enabled="0"/>
 	
 	
