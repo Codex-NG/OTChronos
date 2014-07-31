@@ -51,15 +51,29 @@ class Events
 		bool eventPlayerOnTradeRequest(Player* player, Player* target, Item* item);
 		bool eventPlayerOnGainExperience(Player* player, Creature* target, uint64_t &exp, uint64_t rawExp);
 		bool eventPlayerOnLoseExperience(Player* player, uint64_t &exp);
+		bool eventPlayerOnLogin(Player* player);
+		bool eventPlayerOnLogout(Player* player);
+		bool eventPlayerOnAdvance(Player* player, skills_t, uint32_t, uint32_t);
+		void eventPlayerOnModalWindow(Player* player, uint32_t modalWindowId, uint8_t buttonId, uint8_t choiceId);
+		bool eventPlayerOnTextEdit(Player* player, Item* item, const std::string& text);
+		void eventPlayerOnExtendedOpcode(Player* player, uint8_t opcode, const std::string& buffer);
 
 		// Creature
 		bool eventCreatureOnTarget(Creature* creature, Creature* target, bool isAttacked);
 		bool eventCreatureOnChangeOutfit(Creature* creature, const Outfit_t outfit, const Outfit_t oldOutfit);
 		bool eventCreatureOnAttack(Creature* creature, Creature* target);
 		void eventCreatureOnHear(Creature* creature, Creature* sayCreature, const std::string words, enum SpeakClasses type, Position pos);
+		bool eventCreatureOnThink(Creature* creature, uint32_t interval);
+		bool eventCreatureOnPrepareDeath(Creature* creature, Creature* killer);
+		bool eventCreatureOnDeath(Creature* creature, Item* corpse, Creature* killer, Creature* mostDamageKiller, bool lastHitUnjustified, bool mostDamageUnjustified);
+		bool eventCreatureOnKill(Creature* creature, Creature* target);
+		void eventCreatureOnChangeHealth(Creature* creature, Creature* attacker, CombatDamage& damage);
+		void eventCreatureOnChangeMana(Creature* creature, Creature* attacker, int32_t& manaChange, CombatOrigin origin);
 
 		// Monster
 		void eventMonsterOnTargetDeny(Creature* creature, Creature* target);
+		bool eventMonsterOnAppear(Creature* creature);
+		bool eventMonsterOnDisappear(Creature* creature);
 
 	private:
 		LuaScriptInterface scriptInterface;
@@ -81,15 +95,30 @@ class Events
 		int32_t playerOnTradeRequest;
 		int32_t playerOnGainExperience;
 		int32_t playerOnLoseExperience;
+		int32_t playerOnLogin;
+		int32_t playerOnLogout;
+		int32_t playerOnAdvance;
+		int32_t playerOnModalWindow;
+		int32_t playerOnTextEdit;
+		int32_t playerOnExtendedOpcode;
 
 		// Creature
 		int32_t creatureOnTarget;
 		int32_t creatureOnChangeOutfit;
 		int32_t creatureOnAttack;
 		int32_t creatureOnHear;
+		int32_t creatureOnThink;
+		int32_t creatureOnPrepareDeath;
+		int32_t creatureOnDeath;
+		int32_t creatureOnKill;
+		int32_t creatureOnChangeHealth;
+		int32_t creatureOnChangeMana;
+
 
 		// Monster
 		int32_t monsterOnTargetDeny;
+		int32_t monsterOnAppear;
+		int32_t monsterOnDisappear;
 };
 
 #endif
